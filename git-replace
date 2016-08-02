@@ -1,0 +1,54 @@
+#!/bin/bash
+
+REPO_DIR=$(git rev-parse --show-toplevel)
+REPO_NAME=$(basename $REPO_DIR)
+
+REPO_OLD_REMOTE=$(git config --get remote.origin.url)
+REPO_NEW_REMOTE=$1
+
+# sanity checks
+if [ -z "${REPO_DIR}" ]; then
+    echo "No repository was found, are you in a git repo?"
+    exit
+fi
+
+if [ -z "${REPO_NEW_REMOTE}" ]; then
+    echo "usage: git-replace <remote-url>"
+    exit
+fi
+
+if [ -z "${REPO_OLD_REMOTE}" ]; then
+    echo "No remote branch was found, have you done an initial push?"
+    exit
+fi
+
+# go to baselevel of this repo
+cd $REPO_DIR
+
+echo ""
+
+function git_replace() {
+    git remote set-url origin $REPO_NEW_REMOTE
+    git push -f --set-upstream origin master
+    echo ""
+    echo "Your remote history on \`$REPO_NEW_REMOTE\` has been replaced."
+    echo ""
+    git remote set-url origin $REPO_OLD_REMOTE
+}
+
+while true; do
+    printf "git-replace will overwrite a remote git repository with the current repository:\n"
+    printf "\trepository \t\`$REPO_NAME\`\n"
+    printf "\tremote     \t\`$REPO_NEW_REMOTE\`\n"
+    printf "\tdirectory \t\`$REPO_DIR\`\n\n"
+
+    read -p "Are you sure? [y/n] " yn
+
+    case $yn in
+        [Yy]* ) git_replace; break;;
+        [Nn]* ) exit;;
+        * ) echo ""; echo "Please type yes or no!";echo "";;
+    esac
+done
+
+

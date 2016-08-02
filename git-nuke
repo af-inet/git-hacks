@@ -1,0 +1,68 @@
+#!/bin/bash
+
+REPO_DIR=$(git rev-parse --show-toplevel)
+REPO_NAME=$(basename $REPO_DIR)
+REPO_REMOTE=$(git config --get remote.origin.url)
+
+# sanity checks
+if [ -z "${REPO_NAME}" ]; then
+    echo "No repository was found, are you in a git repo?"
+    exit
+fi
+
+if [ -z "${REPO_REMOTE}" ]; then
+    echo "No remote branch was found, have you done an initial push?"
+    exit
+fi
+
+# go to baselevel of this repo
+cd $REPO_DIR
+
+echo ""
+
+function git_nuke() {
+    rm -rf ./.git
+    git init
+    git add .
+    git commit -m "init"
+    echo ""
+    echo "Your local history has been nuked."
+    echo ""
+}
+
+function git_overwrite() {
+    git remote add origin $REPO_REMOTE
+    git push -f --set-upstream origin master
+    echo ""
+    echo "Your remote history has been nuked."
+    echo ""
+}
+
+while true; do
+    printf "git-nuke will clear all your git history for:\n"
+    printf "\trepository \t\`$REPO_NAME\`\n"
+    printf "\tremote     \t\`$REPO_REMOTE\`\n"
+    printf "\tdirectory \t\`$REPO_DIR\`\n\n"
+
+    read -p "Are you sure? [y/n] " yn
+
+    case $yn in
+        [Yy]* ) git_nuke; break;;
+        [Nn]* ) exit;;
+        * ) echo ""; echo "Please type yes or no!";echo "";;
+    esac
+done
+
+while true; do
+    printf "git-nuke will now overwrite your remote\n"
+    printf "\tremote     \t\`$REPO_REMOTE\`\n\n"
+
+    read -p "Are you sure? [y/n] " yn
+
+    case $yn in
+        [Yy]* ) git_overwrite; break;;
+        [Nn]* ) exit;;
+        * ) echo ""; echo "Please type yes or no!";echo "";;
+    esac
+done
+

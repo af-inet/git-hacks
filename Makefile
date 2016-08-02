@@ -8,8 +8,8 @@ install: git-replace git-nuke
 	cp ./git-replace $(DEST)/git-replace
 
 uninstall:
-	rm /usr/local/bin/git-nuke
-	rm /usr/local/bin/git-replace
+	rm $(DEST)/git-nuke
+	rm $(DEST)/git-replace
 	@echo ""
 	@echo "uninstall finished"
 

@@ -27,5 +27,5 @@ make install
 `git-replace <remote-url>` 
 
 - overwrites a given REMOTE repo with the repo you're CURRENTLY in.
-- example `git-replace "https://github.com/af-inet/git-hacks.git"`
+- example `git-replace "https://github.com/af-inet/git-hacks.git"` would overwrite this repo with your current repo
 
